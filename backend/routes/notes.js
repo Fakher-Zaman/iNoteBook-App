@@ -8,7 +8,7 @@ const Note = require('../models/Note');
 router.get('/fetchallnotes', fetchuser, async (req, res) => {
     try {
         const notes = await Note.find({ user: req.user.id });
-        res.json({ notes, success: true });
+        res.json(notes);
     }
     catch (error) {
         console.error(error.message);
@@ -26,13 +26,13 @@ router.post('/addnote', fetchuser, [
         // If there are errors, return Bad request and the errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array(), success: false });
+            return res.status(400).json({ errors: errors.array() });
         }
         const note = new Note({
             title, description, tag, user: req.user.id
         });
         const savedNote = await note.save();
-        res.json({ savedNote, success: true });
+        res.json(savedNote);
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal server error!");
@@ -57,7 +57,7 @@ router.put('/updatenote/:id', fetchuser, async (req, res) => {
             return res.status(401).send("Not Allowed!");
         }
         note = await Note.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true });
-        res.json({ note, success: true });
+        res.json(note);
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal server error!");
@@ -77,7 +77,7 @@ router.delete('/deletenote/:id', fetchuser, async (req, res) => {
             return res.status(401).send("Not Allowed!");
         }
         await Note.findByIdAndDelete(req.params.id);
-        res.json({ success: true });
+        res.json("Data deleted successfully!");
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal server error!");
